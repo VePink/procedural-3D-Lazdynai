@@ -1,0 +1,727 @@
+/**
+ * File:    Sovietiniai_daugiabuciai.cga
+ * Created: 26 Nov 2017 09:12:02 GMT
+ * Author:  Ve
+ */
+
+version "2017.1"
+
+#---------- ATTRIBUTES ------------#
+	attr pastato_modelis	= "1-464-LI-17"
+	attr Z0 				= 0 #absoliutinis pastato pamato aukstis
+
+@Group ("Orientavimas", 1) //{
+	attr Priekinio_fasado_plokstumos_nr = 4
+	attr Galinio_fasado_plokstumos_nr 	= 2
+//}
+
+@Group ("Kita")//{
+	attr H_pastato 			= 14
+	attr H_virslangio 		= 0.5
+	attr H_lango 			= 1.5
+	attr H_polangio 		= 1.2
+	attr Plotis_lango 		= 1.4
+	attr H_parapeto 		= 0.3
+	attr plotis_parapeto 	= 0.3
+	attr objektu_ant_stogo_skaicius = 7
+	attr H_pamato 			= 1
+	attr H_pirmo_auksto 	= 2.8
+	attr H_perdangos 		= 0.1
+	attr H_vidurinio_auksto = 2.8
+	attr H_pastoges			= 0.5
+	attr laiptines_fasado_plotis 	= 3
+	attr languoto_fasado_plotis 	= 12
+	attr balkono_plotis = 2.5
+	attr langu_fasado_plotis = 4.5
+	attr ventiliacijos_bokstelio_aukstis = 0.7
+	//}
+
+@Group ("Spalvos") //{
+	@Color
+	attr sienos_spalva 				= "#bdbf9c"
+	attr laiptines_sienos_spalva 	= "#babaad"
+	attr laiptines_duru_spalva 		= "#d6c9a2"
+	attr perdangos_spalva 			= "#c4c4c2"
+	attr pamato_spalva 				= "#858585"
+	attr stiklo_spalva 				= "#c2d1cb"
+	attr stogo_spalva				= "#616468"
+	attr parapeto_spalva 			= "#939393"
+	attr balkono_sieneles_spalva	= "#f6f990"
+	//}
+	
+@Group ("Lango_remo_spalvos") //{
+	attr lango_remo_spalva_nr1		= "#efefef"
+	attr lango_remo_spalva_nr2		= "#a98c67"
+	attr lango_remo_spalva_nr3		= "#7a4604"
+	attr lango_remo_spalva_nr4		= "#c3c07c"
+//}
+	
+@Group ("Lango_stiklo_spalvos") //{
+	attr lango_stiklo_spalva_nr1	= "#00c5ff"
+	attr lango_stiklo_spalva_nr2	= "#0078ff"
+	attr lango_stiklo_spalva_nr3	= "#004087"
+	attr lango_stiklo_spalva_nr4	= "#6e6fe3"
+	//}
+
+#----------------------------------#
+
+#----------- CONSTANTS ------------#
+
+#Spalvos testavimui
+//{
+	const yellow 	= "#FFFF00"
+	const red 		= "#ff0000"
+	const blue 		= "#002bff"
+	const green 	= "#06b400"
+	const violet	= "#851bc1"
+	const grey		= "#9a9999"
+//}
+#---------------------------------#
+
+#---------- OTHER RULES -----------#
+Geltona --> 
+	color (yellow)
+	//}
+Raudona --> 
+	color (red)
+	//}
+Melyna --> 
+	color (blue)
+	//}
+	
+Zalia --> 
+	color (green)
+	//}
+
+Violetine -->
+	color (violet)
+	//}
+#----------------------------------#
+
+#______________Karkasas_____________#
+@StartRule
+/*MoveToAbsoluteHeight -->
+	translate(rel, world, 0, Z0, 0)
+		TikrintiModeli
+*/		
+TikrintiModeli -->
+	case pastato_modelis == "1-464-LI-17" : A
+	else : extrude (5)
+
+A --> 
+	extrude (world.up, H_pastato)
+		alignScopeToAxes (y)
+			comp (f)	{ object.top					: Stogo_kurimas
+						| object.bottom					: NIL
+						|Galinio_fasado_plokstumos_nr	: Galinio_fasado_horizontalus_skaidymas	 
+						|Priekinio_fasado_plokstumos_nr	: Priekinio_fasado_horizontalus_skaidymas
+						|all							: Soninio_fasado_kurimas 	
+						}
+						//}
+#___________________________________#
+
+#______________Roof_____________#
+Stogo_kurimas --> 
+	offset(plotis_parapeto * -1)
+		comp (f) 	{inside	: Stogo_plokstuma
+					|border : Parapetas
+					}
+					//}
+
+Stogo_plokstuma --> 
+	extrude (world.up, ventiliacijos_bokstelio_aukstis)
+		comp (f)	{top	: Erdve_objektams_ant_stogo	
+      				|bottom	: Stogo_spalvinimas	
+      				|side	: NIL 
+   					}
+					//}
+
+Erdve_objektams_ant_stogo -->
+	offset(-0.1)
+		comp(f) {inside	: Objektu_ant_stogo_kurimas
+				|border : NIL
+				}
+				//}
+
+Stogo_spalvinimas --> 
+	reverseNormals
+		color (stogo_spalva)
+		//}
+   				
+Objektu_ant_stogo_kurimas -->	
+	split (y) 	{~languoto_fasado_plotis		: NIL
+				|laiptines_fasado_plotis 		: Plotas_ventiliacijos_bokstu_isdestymui
+				|languoto_fasado_plotis			: NIL
+				|laiptines_fasado_plotis 		: Plotas_ventiliacijos_bokstu_isdestymui
+				|~languoto_fasado_plotis		: NIL
+				}
+Plotas_ventiliacijos_bokstu_isdestymui -->
+	split (x) 	{3		: Plotas_ventiliacijos_bokstu_kurimui
+				|~2		: NIL
+				|3		: Plotas_ventiliacijos_bokstu_kurimui
+				}
+
+Plotas_ventiliacijos_bokstu_kurimui -->
+	split (y) 	{0.7	: Bokstelio_kurimas
+				|~2		: NIL
+				|0.7	: Bokstelio_kurimas
+				}
+
+Bokstelio_kurimas --> 
+	extrude (ventiliacijos_bokstelio_aukstis*-1)
+		color (sienos_spalva)
+
+
+Parapetas -->
+	extrude (H_parapeto)
+		color (parapeto_spalva)
+			comp(f)	{ top	: Parapeto_spalvinimas	
+      				|bottom	: NIL 	
+      				|all	: Parapeto_spalvinimas  
+   					}
+					//}
+   					
+Parapeto_spalvinimas -->
+	color (parapeto_spalva)
+	//}
+#___________________________________#
+
+#______________Front facade_____________#
+Priekinio_fasado_horizontalus_skaidymas --> 
+	split (y) 	{ H_pamato				: Priekinio_fasado_pamatas
+				|~H_pirmo_auksto		: Priekinio_fasado_pirmas_aukstas
+				|
+				{~H_vidurinio_auksto	: Priekinio_fasado_vidurinis_aukstas
+				}*
+				|H_pastoges				: Pastoge
+				}
+				//}
+
+Priekinio_fasado_pirmas_aukstas --> 
+	Vertikalus_priekinio_fasado_pirmo_auksto_skaidymas
+	//}
+
+Priekinio_fasado_vidurinis_aukstas --> 
+	Vertikalus_priekinio_fasado_vidurinio_auksto_skaidymas
+	//}
+
+Vertikalus_priekinio_fasado_pirmo_auksto_skaidymas -->
+	alignScopeToAxes (y)
+		split (x) 	{
+					{~languoto_fasado_plotis	: Priekinio_kambario_fasadas
+					|~laiptines_fasado_plotis	: Iejimas
+					}*
+					|~languoto_fasado_plotis 	: Priekinio_kambario_fasadas
+					}
+					//}
+
+Vertikalus_priekinio_fasado_vidurinio_auksto_skaidymas -->
+	alignScopeToAxes (y)
+		split (x) 	{
+					{~languoto_fasado_plotis	: Priekinio_kambario_fasadas
+					|~laiptines_fasado_plotis	: Laiptines_fasadas
+					}*
+					|~languoto_fasado_plotis 	: Priekinio_kambario_fasadas
+					}
+					//}
+					
+Priekinio_fasado_pamatas --> 
+	split (x) 	{
+				{~languoto_fasado_plotis	: Vieno_lygio_Rusio_su_langu_fasadas
+				|~laiptines_fasado_plotis	: Iejimo_laiptai
+				}*
+				|~languoto_fasado_plotis 	: Vieno_lygio_Rusio_su_langu_fasadas
+				}
+				//}
+				
+Iejimas --> 
+	split (y) 	{~1	: Iejimo_kurimas
+				|~1	: Laiptines_fasadas
+				}
+				//}
+
+Iejimo_laiptai --> 
+	NIL	
+	//}
+#___________________________________#
+
+#______________Entrance_____________#
+Iejimo_kurimas -->
+	s ('1, (H_pirmo_auksto/2)+H_pamato-H_perdangos, '1)
+		t (0, -H_pamato, 0)
+			Iejimo_daliu_kurimas
+			//}
+
+Iejimo_daliu_kurimas -->
+	split (y) 	{~0.25	: Laiptines_iejimo_laipto_kurimas
+				|~2.2	: Laiptines_iejimo_fasado_horizontalus_skaidymas
+				|~0.1	: Laiptines_stogelio_kurimas
+				}
+				//}
+
+
+Laiptines_stogelio_kurimas --> 
+	extrude (2.5)
+		r (5, 0, 0)	
+		 t (0,-0.5,0)
+
+
+Laiptines_iejimo_fasado_horizontalus_skaidymas -->
+	split (y)	{~0.9	: Laiptines_iejimo_fasado_vertikalus_skaidymas
+				|0.2	: Sienos_spalvinimas
+				}
+				//}
+
+Laiptines_iejimo_fasado_vertikalus_skaidymas -->
+	split (x)	{~0.4	: Sienos_spalvinimas
+				|~1.2	: Laiptines_duru_kurimas
+				|~0.3	: Sienos_spalvinimas
+				|~2		: Laiptines_duru_kurimas
+				|~0.4	: Sienos_spalvinimas
+				}
+				//}
+
+Laiptines_duru_kurimas -->
+	extrude (0.1)
+		t (0, -0.1, 0)
+			comp (f) 	{top	: NIL
+						|bottom	: reverseNormals 
+									Laiptines_durys
+						|all	: reverseNormals 
+									Sienos_spalvinimas
+						}
+						//}
+
+Laiptines_durys -->
+	color (laiptines_duru_spalva)
+	//}
+Laiptines_iejimo_laipto_kurimas --> 
+	extrude (2)	
+		Pamato_spalvinimas
+		//}
+#___________________________________#
+
+#______________Back facade_____________#
+Galinio_fasado_horizontalus_skaidymas --> 
+	split (y) 	{H_pamato				: Galinio_fasado_pamatas
+				|~H_pirmo_auksto		: Galinio_fasado_pirmas_aukstas
+				|
+				{~H_vidurinio_auksto	: Galinio_fasado_vidurinis_aukstas
+				}*
+				|H_pastoges				: Pastoge
+				}
+				//}
+
+Galinio_fasado_pirmas_aukstas --> 
+	Vertikalus_galinio_fasado_skaidymas
+	//}
+
+Galinio_fasado_vidurinis_aukstas --> 
+	Vertikalus_galinio_fasado_skaidymas
+	//}
+
+Vertikalus_galinio_fasado_skaidymas -->
+	split (x) 	{
+				{~balkono_plotis		: Balkonas
+				|~balkono_plotis		: Balkonas
+				|~langu_fasado_plotis	: Galinio_kambario_fasadas
+				|~balkono_plotis		: Balkonas
+				|~balkono_plotis		: Balkonas
+				}*
+				}
+				//}
+
+Galinio_fasado_pamatas --> 
+	split (x) 	{
+				{~balkono_plotis		: Itraukto_Rusio_su_langu_fasadas
+				|~balkono_plotis		: Itraukto_Rusio_su_langu_fasadas
+				|~langu_fasado_plotis/2	: Vieno_lygio_Rusio_su_langu_fasadas
+				|~langu_fasado_plotis/2	: Vieno_lygio_Rusio_su_langu_fasadas
+				|~balkono_plotis		: Itraukto_Rusio_su_langu_fasadas
+				|~balkono_plotis		: Itraukto_Rusio_su_langu_fasadas
+				}*
+				}
+				//}
+#___________________________________#
+
+#______________Side facade_____________#
+Soninio_fasado_kurimas --> 
+	split (y) 	{H_pamato 							: Soninio_fasado_pamatas
+				|~H_pirmo_auksto - H_perdangos		: Namo_galine_siena
+				|H_perdangos						: Perdanga
+				|
+				{~H_vidurinio_auksto - H_perdangos 	: Namo_galine_siena
+				|H_perdangos						: Perdanga
+				}*
+				|H_pastoges							: Pastoge
+				}
+				//}
+				
+				
+Namo_galine_siena -->
+	Sienos_spalvinimas
+	//}
+
+Soninio_fasado_pamatas -->
+	split (x) 	{~laiptines_fasado_plotis	: Pamato_spalvinimas
+				|~languoto_fasado_plotis	: Vieno_lygio_Rusio_su_langu_fasadas
+				|~laiptines_fasado_plotis	: Pamato_spalvinimas
+				}
+				//}
+#___________________________________#
+
+#______________Basement_____________#
+Vieno_lygio_Rusio_su_langu_fasadas -->
+	split(y) 	{~1 	: Rusio_polangio_zona
+             	|~1.2 	: Rusio_lango_zona
+             	|~0.5	: Rusio_virslangio_zona
+             	}
+				//}
+             	
+Itraukto_Rusio_su_langu_fasadas -->
+	extrude (1.0)
+		t (0, -1.0, 0)
+			alignScopeToAxes (y)
+				comp (f) 	{ top	: reverseNormals 
+										Perdanga
+							| bottom	: NIL
+							| front	: NIL 
+      						| back	: reverseNormals 
+      									Rusio_po_balkonu_su_langu_fasadas
+      						| left	: reverseNormals
+      									Pamato_spalvinimas
+      						| right	: reverseNormals
+      									Pamato_spalvinimas
+							}
+							//}
+
+Rusio_po_balkonu_su_langu_fasadas -->
+	split(x){
+			{~0.1	: Rusio_po_balkonu_sienele
+			|~2		: Vieno_lygio_Rusio_su_langu_fasadas
+            }*
+            }
+			//}
+
+Rusio_po_balkonu_sienele --> 
+	extrude (1)
+		Pamato_spalvinimas
+		//}
+
+Rusio_polangio_zona -->
+	color (pamato_spalva)
+	//}
+
+Rusio_lango_zona -->
+	split(x){
+			{~1 			: Pamato_spalvinimas 
+            |Plotis_lango 	: Rusio_langas
+            |~1				: Pamato_spalvinimas 
+            }*
+            }
+			//}
+
+Rusio_langas -->
+	extrude (0.15)
+		t (0, -0.15, 0)
+			comp (f) 	{top	: NIL
+						|bottom	: reverseNormals 
+									Rusio_lango_medziaga
+						|all	: reverseNormals 
+									Pamato_spalvinimas
+						}
+						//}
+
+Rusio_lango_medziaga -->
+	60%		: Rusio_langas_groteles
+	30%		: Rusio_langas_stiklas
+	else	: Rusio_langas_uzmurytas
+	//}
+
+Rusio_langas_groteles -->
+	color ("#90C583")
+	//}
+	
+Rusio_langas_uzmurytas -->
+	color ("#c5a82f")
+	//}
+
+Rusio_langas_stiklas -->
+	color ("#58a6bd")
+	//}
+
+Rusio_virslangio_zona -->
+	Pamato_spalvinimas
+	//}
+#___________________________________#
+				
+#______________Foundation_____________#
+Pamato_spalvinimas -->
+	color (pamato_spalva)
+	//}
+#___________________________________#
+
+#______________Front facade Room facade_____________#
+Priekinio_kambario_fasadas --> 
+	split(y) 	{~H_polangio 	: Polangio_zona
+             	|~H_lango		: Lango_zona
+             	|~H_virslangio	: Virslangio_zona
+             	|H_perdangos	: Perdanga
+             	}
+				//}
+#___________________________________#
+
+#______________Back facade Room facade_____________#
+Galinio_kambario_fasadas --> 
+	split(y) 	{~H_polangio 	: Polangio_zona
+             	|~H_lango		: Lango_zona
+             	|~H_virslangio	: Virslangio_zona
+             	|H_perdangos	: Perdanga
+             	}
+				//}
+#___________________________________#
+
+#______________Balcony_____________# 
+Balkonas --> 
+	split(y) 	{~2.2 			: Balkono_fasadas
+             	|H_perdangos	: Perdanga
+             	}
+				//}
+
+Balkono_fasadas --> 	
+	split(x){
+			{~2		: Balkono_kurimas
+            |~0.1	: Sienos_spalvinimas 
+            }*
+            }
+			//}
+            
+Balkono_kurimas -->
+	extrude (1.0)
+		t (0, -1.0, 0)
+			alignScopeToAxes (y)
+				comp (f) 	{ top	: reverseNormals 
+										Perdanga
+							| bottom	: reverseNormals 
+										Perdanga
+							|front	: Balkono_isorinis_fasadas 
+      						|back	: reverseNormals 
+      									Balkono_kambario_fasadas
+      						|left	: reverseNormals
+      									Sienos_spalvinimas
+      						|right	: reverseNormals
+      									Sienos_spalvinimas
+							}
+							//}
+						
+Balkono_isorinis_fasadas -->
+	split(y) 	{~H_polangio 				: Balkono_sienele
+             	|~H_virslangio + H_lango 	: Ar_balkonas_istiklintas
+             	}
+				//}
+             			
+Balkono_sienele --> 
+	s ('0.99, '1, '1)
+		extrude (0.10)
+	 		t (0, -0.1, 0)
+	 		alignScopeToAxes (y)
+	 			comp(f)	{top	: Balkono_tureklo_spalvinimas	
+      					|all	: Balkono_sieneles_spalvinimas 	
+   						}
+						//}
+
+Balkono_sieneles_spalvinimas -->				
+	color (balkono_sieneles_spalva)
+	//}
+
+Balkono_tureklo_spalvinimas -->				
+	color ("#67767a")
+	//}
+
+Ar_balkonas_istiklintas -->
+	70%  : Balkono_langas
+	else : NIL
+	//}
+
+Balkono_langas -->
+	t (0, 0, -0.08)
+		Atsitiktinis_balkono_langas
+		//}
+		
+Atsitiktinis_balkono_langas -->
+	60%		: Triju_daliu_balkono_langas
+	30%		: Sesiu_daliu_balkono_langas
+	8%		: Keturiu_daliu_balkono_langas
+	else	: Vienos_dalies_balkono_langas
+	//}
+
+Vienos_dalies_balkono_langas --> 
+	Lango_remo_kurimas
+	//}
+
+Triju_daliu_balkono_langas -->
+	split (x)	{~0.33 	: Lango_remo_kurimas
+				|~0.33	: Lango_remo_kurimas
+				|~0.33	: Lango_remo_kurimas
+				}
+				//}
+
+Keturiu_daliu_balkono_langas -->
+	split (x)	{~0.25 	: Lango_remo_kurimas
+				|~0.25	: Lango_remo_kurimas
+				|~0.25	: Lango_remo_kurimas
+				|~0.25	: Lango_remo_kurimas
+				}
+				//}
+
+Sesiu_daliu_balkono_langas -->
+	split (x)	{~0.25 	: Balkono_lango_skaidymas_horizontaliai
+				|~0.25	: Balkono_lango_skaidymas_horizontaliai
+				|~0.25	: Balkono_lango_skaidymas_horizontaliai
+				}
+				//}
+
+Balkono_lango_skaidymas_horizontaliai -->
+	split (y) 	{~0.5	: Lango_remo_kurimas
+				|~0.2	: Lango_remo_kurimas		
+				}
+				//}				
+				
+					
+Balkono_kambario_fasadas -->
+		split(y) 	{~H_polangio 		: Polangio_zona
+             		|~H_lango			: Lango_zona
+             		|~H_virslangio		: Virslangio_zona
+             		}
+					//}
+#___________________________________#
+
+#______________Window_____________#           
+Polangio_zona -->
+	Sienos_spalvinimas
+	//}
+	
+Lango_zona -->
+	split(x){
+			{~0.5 				: Sienos_spalvinimas 
+            |Plotis_lango		: Lango_nisa
+            |~0.5				: Sienos_spalvinimas
+            }*
+            }
+			//}
+
+Virslangio_zona -->
+	Sienos_spalvinimas
+	//}
+
+Lango_nisa -->
+	extrude (0.25)
+		t (0, -0.25, 0)
+			comp (f) 	{top	: NIL
+						|bottom	: reverseNormals 
+									Lango_remo_kurimas
+						|all	: reverseNormals 
+									Sienos_spalvinimas
+						}
+						//}
+
+Lango_remo_kurimas -->
+	offset(-0.07)
+		comp (f) 	{border = Lango_remas
+					|inside	: Stiklas
+					}
+					//}
+
+Lango_remas -->
+	extrude (0.05)
+		Lango_remo_spalvinimas
+		//}		
+
+Lango_remo_spalvinimas -->
+	30% 	:	color (lango_remo_spalva_nr1)
+	30% 	:	color (lango_remo_spalva_nr2)
+	30% 	:	color (lango_remo_spalva_nr3)
+	else	:	color (lango_remo_spalva_nr4)
+	//}
+
+Stiklas -->
+	30% 	:	color (lango_stiklo_spalva_nr1)
+	30% 	:	color (lango_stiklo_spalva_nr2)
+	30% 	:	color (lango_stiklo_spalva_nr3)
+	else	:	color (lango_stiklo_spalva_nr4)
+	//}
+#___________________________________#
+
+#______________Landing facade_____________#
+Laiptines_fasadas -->
+	extrude (0.5)
+		t (0, -0.5, 0)
+			alignScopeToAxes (y)	
+				comp (f) 	{top	: NIL
+							|bottom	: NIL	
+      						|front	: NIL  
+      						|back	: Laiptines_fasado_kurimas
+      									reverseNormals
+      						|left	: reverseNormals 
+      									Sienos_spalvinimas
+      						|right	: reverseNormals
+      									Sienos_spalvinimas	
+   							}
+							//}
+
+Laiptines_fasado_kurimas --> 
+	split(y){
+			{~0.8 	: Laiptines_langas 
+            |~0.6	: Laiptines_polangis
+            }*
+            }
+			//}
+
+Laiptines_langas -->
+	extrude (0.15)
+			comp (f) 	{top	: NIL
+						|bottom	: t (0, 0, -0.15)
+									Laiptines_langu_skirstymas
+						|all	: reverseNormals 
+									Sienos_spalvinimas
+						}
+						//}
+
+Laiptines_lango_remo_kurimas -->
+	offset(-0.07)
+		comp (f) 	{border = Laiptines_lango_remas
+					|inside	: Stiklas
+					}
+					//}
+
+Laiptines_langu_skirstymas -->
+	split (x) 	{~0.7 : Laiptines_lango_remo_kurimas
+				|~0.3 : Laiptines_lango_remo_kurimas
+				}
+				//}
+
+Laiptines_lango_remas -->
+	extrude (0.05)
+	//}
+
+Laiptines_polangis -->
+	reverseNormals
+		Laiptines_fasado_spalvinimas
+		//}
+
+Laiptines_fasado_spalvinimas -->
+	color (laiptines_sienos_spalva)
+	//}
+#___________________________________#
+
+Perdanga -->
+	color (perdangos_spalva)
+	//}
+
+Pastoge --> 
+	Sienos_spalvinimas
+	//}
+
+Sienos_spalvinimas -->
+	color (sienos_spalva)
+	//}
