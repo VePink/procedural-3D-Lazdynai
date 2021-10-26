@@ -12,7 +12,7 @@ Procedural 3D model generation rules are located in rules_CGA folder.
 <img src="/images/references/type_1-464-LI-51_photo.JPG" width="500"/>
 
 
-- <a href="ttps://en.wikipedia.org/wiki/Procedural_modeling" target="_blank">Procedural 3D modeling</a>
+- <a href="https://en.wikipedia.org/wiki/Procedural_modeling" target="_blank">Procedural 3D modeling</a>
 
 - <a href="https://www.esri.com/en-us/arcgis/products/arcgis-cityengine/overview" target="_blank">CityEngine software used to write rules and generate 3D models</a>
 
