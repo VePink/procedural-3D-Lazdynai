@@ -16,4 +16,4 @@ Procedural 3D model generation rules are located in rules_CGA folder.
 
 - CityEngine software: https://www.esri.com/en-us/arcgis/products/arcgis-cityengine/overview
 
-- Lazdynai district: https://bit.ly/3FTBnhC
+- <a href="https://bit.ly/3FTBnhC" target="_blank">- Lazdynai district</a>
