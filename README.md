@@ -4,7 +4,7 @@
 <img src="/images/Preview.JPG" width="800"/>
 <h2><a href="https://skfb.ly/6v7oA" target="_blank">open interactive 3D demo with generated models</a></h2>
 
-Procedural 3D model generation rules are located in rules_CGA folder. 
+Procedural 3D model generation rules are located in rules_CGA folder. Building models generated proceduraly, without manual modeling.
 
 <a href="https://github.com/VePink/procedural-3D-Lazdynai/blob/main/rules_CGA/Blokinis_1-464-LI-17_tipo.cga" target="_blank">'Blokinis_1-464-LI-17_tipo.cga'</a> - creates 1-464-LI-17 type 5 store building models using <a href="https://github.com/VePink/procedural-3D-Lazdynai/tree/main/polygons_SHP" target="_blank">input polygons (*.shp)</a>.
 <img src="/images/references/type_1-464-LI-17_photo.JPG" width="500"/>
