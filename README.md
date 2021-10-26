@@ -1,6 +1,6 @@
 # procedural-3D-Lazdynai
 
-<img src="/images/SketchFab_preview.JPG" width="1000"/>
+<img src="/images/SketchFab_preview.JPG" width="700"/>
 3D models interactive demo: https://skfb.ly/6v7oA
 
 Procedural 3D model generation rules are located in rules_CGA folder. 
